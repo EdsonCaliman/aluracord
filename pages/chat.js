@@ -62,7 +62,7 @@ export default function ChatPage() {
                         as="form"
                         styleSheet={{
                             display: 'flex',
-                            alignItems: 'center',
+                            alignItems: 'center'
                         }}
                     >
                         <TextField
@@ -90,6 +90,22 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <Box
+                            styleSheet={{
+                                marginBottom: '8px',
+                            }}
+                        >
+                            <Button iconName="arrowRight"
+                                variant='tertiary'
+                                colorVariant='neutral'
+                                styleSheet={{
+                                    backgroundColor: appConfig.theme.colors.neutrals[900],
+                                }}
+                                onClick={() => {
+                                    handleNewMessage(message);
+                                }}
+                            />
+                        </Box>
                     </Box>
                 </Box>
             </Box>
