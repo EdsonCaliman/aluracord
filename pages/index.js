@@ -51,7 +51,7 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
-            onSubmit={function (event){
+            onSubmit={function (event) {
               event.preventDefault();
               routing.push('/chat');
             }}
