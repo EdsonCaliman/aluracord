@@ -1,22 +1,40 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+
+const SUPBASE_URL = process.env.NEXT_PUBLIC_SUPBASE_URL;
+const SUPBASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPBASE_ANON_KEY;
 
 export default function ChatPage() {
+    const routing = useRouter();
+    const username = routing.query.username;
     const [message, setMessage] = React.useState('');
     const [listOfMessages, setListOfMessages] = React.useState([]);
 
+    const client = createClient(SUPBASE_URL, SUPBASE_ANON_KEY);
+
+    React.useEffect(() => {
+        client.from('messages').select('*').order('id', { ascending: false }).then(({ data }) => {
+            setListOfMessages(data);
+        });
+    }, []);
+
+
     function handleNewMessage(novaMensagem) {
         const message = {
-            id: listOfMessages.length + 1,
-            from: 'edsoncaliman',
+            from: username,
             text: novaMensagem,
         };
 
-        setListOfMessages([
-            message,
-            ...listOfMessages,
-        ]);
+        client.from('messages').insert([message]).then(({ data }) => {
+            setListOfMessages([
+                data[0],
+                ...listOfMessages,
+            ]);
+        });
+
         setMessage('');
     }
 
@@ -132,7 +150,6 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log(props);
     return (
         <Box
             tag="ul"
@@ -173,7 +190,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/edsoncaliman.png`}
+                                src={`https://github.com/${message.from}.png`}
                             />
                             <Text tag="strong">
                                 {message.from}
