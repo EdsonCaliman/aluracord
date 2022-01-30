@@ -13,7 +13,6 @@ export default function MessageList(props) {
                 flex: 1,
                 color: appConfig.theme.colors.neutrals["000"],
                 marginBottom: '16px',
-                overflow: 'hidden',
             }}
         >
             {props.messages.map((message) => {
@@ -59,7 +58,13 @@ export default function MessageList(props) {
                                 {(new Date().toLocaleDateString())}
                             </Text>
                         </Box>
-                        {message.text}
+                        {message.text.startsWith(':sticker:')
+                            ? (
+                                <Image width='20%' src={message.text.replace(':sticker:', '')} />
+                            ) : (
+                                message.text
+                            )
+                        }
                     </Text>
                 );
             })}

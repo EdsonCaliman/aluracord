@@ -3,11 +3,22 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { createClient } from '@supabase/supabase-js';
-import Header from '../src/components/header';
+import Header from '../src/components/Header';
 import MessageList from '../src/components/MessageList';
+import ButtonSendSticker from '../src/components/ButtonSendSticker';
 
 const SUPBASE_URL = process.env.NEXT_PUBLIC_SUPBASE_URL;
 const SUPBASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPBASE_ANON_KEY;
+const supabaseClient = createClient(SUPBASE_URL, SUPBASE_ANON_KEY);
+
+function listenRealTimeMessages(addMessage) {
+    return supabaseClient
+        .from('messages')
+        .on('INSERT', (response) => {
+            addMessage(response.new);
+        })
+        .subscribe();
+}
 
 export default function ChatPage() {
     const routing = useRouter();
@@ -15,26 +26,36 @@ export default function ChatPage() {
     const [message, setMessage] = React.useState('');
     const [listOfMessages, setListOfMessages] = React.useState([]);
 
-    const client = createClient(SUPBASE_URL, SUPBASE_ANON_KEY);
-
     React.useEffect(() => {
-        client.from('messages').select('*').order('id', { ascending: false }).then(({ data }) => {
+        supabaseClient.from('messages').select('*').order('id', { ascending: false }).then(({ data }) => {
             setListOfMessages(data);
         });
+
+        const subscription = listenRealTimeMessages((newMessage) => {
+            setListOfMessages((updatedListOfMessages) => {
+                return [
+                    newMessage,
+                    ...updatedListOfMessages,
+                ]
+            });
+        });
+
+        return () => {
+            subscription.unsubscribe();
+          }
+
     }, []);
 
     function handleNewMessage(novaMensagem) {
+        if (novaMensagem === '')
+            return;
+
         const message = {
             from: username,
             text: novaMensagem,
         };
 
-        client.from('messages').insert([message]).then(({ data }) => {
-            setListOfMessages([
-                data[0],
-                ...listOfMessages,
-            ]);
-        });
+        supabaseClient.from('messages').insert([message]).then();
 
         setMessage('');
     }
@@ -109,9 +130,14 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <ButtonSendSticker
+                            onStickerClick={(sticker) => {
+                                handleNewMessage(`:sticker: ${sticker}`);
+                            }} />
                         <Box
                             styleSheet={{
                                 marginBottom: '8px',
+                                marginLeft: '8px',
                             }}
                         >
                             <Button iconName="arrowRight"

@@ -2,7 +2,7 @@ import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 import React from 'react';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
-import Title from '../src/components/title'
+import Title from '../src/components/Title'
 
 export default function PaginaInicial() {
   const [username, setUsername] = React.useState('edsoncaliman');
