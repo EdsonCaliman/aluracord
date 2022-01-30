@@ -2,22 +2,7 @@ import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 import React from 'react';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
-
-function Title(props) {
-  const Tag = props.tag || 'h1';
-  return (
-    <>
-      <Tag>{props.children}</Tag>
-      <style jsx>{`
-            ${Tag} {
-                color: ${appConfig.theme.colors.neutrals['000']};
-                font-size: 24px;
-                font-weight: 600;
-            }
-            `}</style>
-    </>
-  );
-}
+import Title from '../src/components/title'
 
 export default function PaginaInicial() {
   const [username, setUsername] = React.useState('edsoncaliman');
